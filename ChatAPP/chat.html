@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Chat Room</h1>
+    <div id="messages" style="height: 400px; overflow-y: scroll;">
+    </div>
+    <form id="messageForm">
+        <input type="text" id="newMessage" placeholder="Type your message...">
+        <button type="submit" id="sendMessage">Send</button>
+    </form>
+    <button id="logout">Logout</button>
+</div>
+
+<script>
+    $(document).ready(function () {
+        const storedEmail = window.localStorage.getItem('userEmail');
+        if (storedEmail) {
+            window.userEmail = storedEmail;
+            console.log('Restored user email:', window.userEmail);
+        } else {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const socket = new WebSocket(`ws://${location.host}/message`);
+
+        socket.onopen = function (event) {
+            console.log('Connected to chat server');
+        };
+
+        socket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            const messageClass = data.email === window.userEmail ? 'my-message' : 'other-message';
+            const messageHtml = `<div class="${messageClass}">
+                                    <span class="sender-email">${data.email}:</span>
+                                    <span class="message-content">${data.message}</span>
+                                 </div>`;
+            $('#messages').append(messageHtml);
+            $('#messages')[0].scrollIntoView(false);
+        };
+
+        socket.onerror = function (error) {
+            console.error('WebSocket error:', error);
+        };
+
+        socket.onclose = function (event) {
+            console.log('Disconnected from chat server');
+        };
+
+        $('#messageForm').submit(function (e) {
+            e.preventDefault();
+            const message = $('#newMessage').val();
+            const userEmail = window.userEmail;
+            if (message.trim() && userEmail) {
+                const fullMessage = JSON.stringify({ email: userEmail, message: message });
+                console.log('Sending message:', fullMessage);
+                socket.send(fullMessage);
+                $('#newMessage').val('');
+            } else {
+                if (!userEmail) console.error('User email is not set.');
+                if (!message.trim()) console.error('Message is empty.');
+            }
+        });
+
+        $('#logout').click(function () {
+            window.localStorage.removeItem('userEmail');
+            window.location.href = 'login.html';
+        });
+
+    });
+</script>
+</body>
+</html>

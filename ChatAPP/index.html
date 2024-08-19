@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Chat App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <style>
+        body {
+            background-color: hsl(220, 20%, 90%);
+            font-family: 'Roboto', sans-serif;
+
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+        }
+
+        .btn {
+            background-color: #1f2937;
+            color: white;
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background-color: #111827;
+        }
+
+        .form-group {
+            margin-bottom: 4px;
+        }
+
+        .form-input {
+            appearance: none;
+            display: block;
+            width: 100%;
+            background-color: #d1d5db;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            padding: 3px 4px;
+            line-height: normal;
+            outline: none;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background-color: white;
+            border-color: #3b82f6;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 2px;
+            font-size: 14px;
+            font-weight: bolder;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body>
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="w-full max-w-md">
+        <div class="flex justify-center mb-6">
+            <img class="logo" src="logo-background" alt="Logo">
+        </div>
+        <h1 class="text-3xl font-bold mb-4 text-center">Welcome to Chat App</h1>
+        <p class="text-lg text-gray-600 mb-6 text-center">Please choose an option:</p>
+        <div class="flex justify-center">
+            <a href="register.html" class="btn mr-2">Register</a>
+            <a href="login.html" class="btn mr-2">Login</a>
+            <a href="admin_login.html" class="btn ml-2">Admin Login</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

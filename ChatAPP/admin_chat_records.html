@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Chat Records</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+  <h1>Admin Chat Records</h1>
+
+  <div id="adminFeedback" class="feedback"></div>
+
+  <input type="text" id="filterEmail" placeholder="Filter by email">
+  <button id="filterEmailButton">Filter by Email</button>
+
+  <input type="text" id="filterMessage" placeholder="Filter by message">
+  <button id="filterMessageButton">Filter by Message</button>
+
+  <input type="datetime-local" id="filterStartTime" placeholder="Start Time">
+  <input type="datetime-local" id="filterEndTime" placeholder="End Time">
+  <button id="filterTimeButton">Filter by Time</button>
+
+  <button id="showAllButton">Show All</button>
+
+  <table id="chatRecordsTable" class="table table-striped">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Message</th>
+      <th>Timestamp</th>
+      <th>Sender Email</th>
+      <th>IP Address</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="chatRecordsBody">
+    </tbody>
+  </table>
+
+  <script>
+    $(document).ready(function () {
+      var isAdminLoggedIn = checkAdminLogin();
+      if (!isAdminLoggedIn) {
+        window.location.href = 'admin_login.html';
+        return;
+      }
+
+      loadChatRecords();
+
+      function checkAdminLogin() {
+        return true;
+      }
+
+      function loadChatRecords(url) {
+        $.get(url || '/admin/chat_records', function (data) {
+          console.log('Chat records:', data);
+          var tbody = $('#chatRecordsBody');
+          tbody.empty();
+
+          data.reverse();
+
+          data.forEach(function (record) {
+            var row = '<tr>' +
+                    '<td>' + record.ID + '</td>' +
+                    '<td>' + record.Message + '</td>' +
+                    '<td>' + record.Timestamp + '</td>' +
+                    '<td>' + record.SenderEmail + '</td>' +
+                    '<td>' + record.IPAddress + '</td>' +
+                    '<td><button class="deleteButton" data-id="' + record.ID + '">Delete</button></td>' +
+                    '</tr>';
+            tbody.append(row);
+          });
+
+          $('.deleteButton').on('click', function () {
+            var recordID = $(this).data('id');
+            deleteRecord(recordID);
+          });
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+          console.error('Request failed:', textStatus, errorThrown);
+          $('#adminFeedback').text('Failed to fetch chat records. Please try again later.');
+        });
+      }
+
+      function deleteRecord(recordID) {
+        $.ajax({
+          url: '/admin/delete_record/' + recordID,
+          type: 'DELETE',
+          success: function () {
+            loadChatRecords();
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.error('Delete request failed:', textStatus, errorThrown);
+            $('#adminFeedback').text('Failed to delete record. Please try again later.');
+          }
+        });
+      }
+
+      $('#filterEmailButton').on('click', function () {
+        var email = $('#filterEmail').val();
+        loadChatRecords('/admin/filter_records/' + email);
+      });
+
+      $('#filterMessageButton').on('click', function () {
+        var message = $('#filterMessage').val();
+        loadChatRecords('/admin/filter_records_by_message/' + message);
+      });
+
+      $('#filterTimeButton').on('click', function () {
+        var startTime = $('#filterStartTime').val();
+        var endTime = $('#filterEndTime').val();
+        loadChatRecords('/admin/filter_records_by_time/' + startTime + '/' + endTime);
+      });
+
+      $('#showAllButton').on('click', function () {
+        loadChatRecords();
+      });
+    });
+  </script>
+</div>
+</body>
+</html>

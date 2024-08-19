@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+  <h1>Login</h1>
+  <form id="loginForm">
+    Email: <input type="text" id="loginEmail" required><br>
+    Password: <input type="password" id="loginPassword" required><br>
+    <button type="submit">Login</button>
+  </form>
+  <p id="loginFeedback"></p>
+  <a href="index.html">Back to Home</a>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $('#loginForm').submit(function (e) {
+      e.preventDefault();
+      var email = $('#loginEmail').val();
+      var password = $('#loginPassword').val();
+
+      $.post('/login/' + email + '/' + password, function (data) {
+        console.log('Server response:', data);
+        if (data === 'Logged in successfully') {
+          window.localStorage.setItem('userEmail', email);
+          window.userEmail = email;
+          console.log('Logged in user email:', email);
+          window.location.href = 'chat.html';
+        } else {
+          $('#loginFeedback').text('Account or password is incorrect.');
+        }
+      }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.error('Request failed:', textStatus, errorThrown);
+        $('#loginFeedback').text('Failed to connect to the server. Please try again later.');
+      });
+    });
+  });
+</script>
+</body>
+</html>
